@@ -7,7 +7,7 @@ import { ContentType } from '../types';
 
 interface ContentTypeMultiSelectProps {
   selectedContentTypes: ContentType[];
-  setSelectedContentTypes: (contentTypes: ContentType[]) => void;
+  setSelectedContentTypes: (_contentTypes: ContentType[]) => void;
   sdk: ConfigAppSDK;
   cma: CMAClient;
 }
@@ -27,34 +27,34 @@ const ContentTypeMultiSelect: React.FC<ContentTypeMultiSelectProps> = ({ selecte
     setFilteredItems(newFilteredItems);
   };
 
-  const fetchAllContentTypes = async (): Promise<ContentTypeProps[]> => {
-    let allContentTypes: ContentTypeProps[] = [];
-    let skip = 0;
-    const limit = 1000;
-    let areMoreContentTypes = true;
-
-    while (areMoreContentTypes) {
-      const response = await cma.contentType.getMany({
-        spaceId: sdk.ids.space,
-        environmentId: sdk.ids.environment,
-        query: { skip, limit },
-      });
-      if (response.items) {
-        allContentTypes = allContentTypes.concat(response.items as ContentTypeProps[]);
-        areMoreContentTypes = response.items.length === limit;
-      } else {
-        areMoreContentTypes = false;
-      }
-      skip += limit;
-    }
-
-    return allContentTypes;
-  };
-
   useEffect(() => {
     (async () => {
       const currentState = await sdk.app.getCurrentState();
       const currentContentTypesIds = Object.keys(currentState?.EditorInterface || {});
+
+      const fetchAllContentTypes = async (): Promise<ContentTypeProps[]> => {
+        let allContentTypes: ContentTypeProps[] = [];
+        let skip = 0;
+        const limit = 1000;
+        let areMoreContentTypes = true;
+    
+        while (areMoreContentTypes) {
+          const response = await cma.contentType.getMany({
+            spaceId: sdk.ids.space,
+            environmentId: sdk.ids.environment,
+            query: { skip, limit },
+          });
+          if (response.items) {
+            allContentTypes = allContentTypes.concat(response.items as ContentTypeProps[]);
+            areMoreContentTypes = response.items.length === limit;
+          } else {
+            areMoreContentTypes = false;
+          }
+          skip += limit;
+        }
+    
+        return allContentTypes;
+      };
 
       const allContentTypes = await fetchAllContentTypes();
 
@@ -74,7 +74,7 @@ const ContentTypeMultiSelect: React.FC<ContentTypeMultiSelectProps> = ({ selecte
         setSelectedContentTypes(currentContentTypes);
       }
     })();
-  }, []);
+  }, [cma.contentType, sdk.app, sdk.ids.environment, sdk.ids.space, setSelectedContentTypes]);
 
   return (
     <>
