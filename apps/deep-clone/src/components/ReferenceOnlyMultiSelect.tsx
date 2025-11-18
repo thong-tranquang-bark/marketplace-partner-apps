@@ -65,7 +65,7 @@ const ReferenceOnlyMultiSelect: React.FC<ReferenceOnlyMultiSelectProps> = ({ sel
       setAvailableContentTypes(newAvailableContentTypes);
       setFilteredItems(newAvailableContentTypes);
     })();
-  }, [cma, sdk, setSelectedContentTypes, selectedContentTypes]);
+  }, [cma, sdk]);
 
   return (
     <>

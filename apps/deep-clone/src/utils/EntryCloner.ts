@@ -12,17 +12,17 @@ class EntryCloner {
   private parameters: AppParameters;
   private cma: CMAClient;
   private entryId: string;
-  private setReferencesCount: (count: number) => void;
-  private setClonesCount: (count: number) => void;
-  private setUpdatesCount: (count: number) => void;
+  private setReferencesCount: (_count: number) => void;
+  private setClonesCount: (_count: number) => void;
+  private setUpdatesCount: (_count: number) => void;
 
   constructor(
     cma: CMAClient,
     parameters: AppParameters,
     entryId: string,
-    setReferencesCount: (count: number) => void,
-    setClonesCount: (count: number) => void,
-    setUpdatesCount: (count: number) => void
+    setReferencesCount: (_count: number) => void,
+    setClonesCount: (_count: number) => void,
+    setUpdatesCount: (_count: number) => void
   ) {
     this.cma = cma;
     this.parameters = parameters;
