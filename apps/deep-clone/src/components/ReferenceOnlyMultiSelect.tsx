@@ -14,12 +14,13 @@ interface ReferenceOnlyMultiSelectProps {
 
 const ReferenceOnlyMultiSelect: React.FC<ReferenceOnlyMultiSelectProps> = ({ selectedContentTypes, setSelectedContentTypes, sdk, cma }) => {
   const [availableContentTypes, setAvailableContentTypes] = useState<ContentType[]>([]);
+  const [filteredItems, setFilteredItems] = React.useState<ContentType[]>([]);
+
   const getPlaceholderText = (): string => {
     if (selectedContentTypes.length === 0) return 'Select one or more';
     if (selectedContentTypes.length === 1) return selectedContentTypes[0]?.name || '';
     return `${selectedContentTypes[0]?.name || ''} and ${selectedContentTypes.length - 1} more`;
   };
-  const [filteredItems, setFilteredItems] = React.useState<ContentType[]>([]);
 
   const handleSearchValueChange = (event: { target: { value: any } }) => {
     const value = event.target.value;
