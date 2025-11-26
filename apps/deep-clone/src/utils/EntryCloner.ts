@@ -6,6 +6,7 @@ type ReferenceMap = Record<string, EntryProps>;
 
 class EntryCloner {
   private references: ReferenceMap = {};
+  private referencesTree: ReferenceMap = {};
   private clones: ReferenceMap = {};
   private contentTypes: { [id: string]: ContentTypeProps } = {};
   private updates: number = 0;
@@ -44,6 +45,12 @@ class EntryCloner {
   async getReferencesQty(): Promise<number> {
     await this.findReferences(this.entryId);
     return Object.keys(this.references).length;
+  }
+
+  async getReferencesTree(): Promise<Record<string, EntryProps>> {
+    await this.findReferences(this.entryId);
+    this.referencesTree = this.references;
+    return this.referencesTree;
   }
 
   private async findReferences(entryId: string): Promise<void> {
