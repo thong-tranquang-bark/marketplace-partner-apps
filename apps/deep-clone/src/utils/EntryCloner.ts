@@ -9,28 +9,15 @@ class EntryCloner {
   private clones: ReferenceMap = {};
   private contentTypes: { [id: string]: ContentTypeProps } = {};
   private updates: number = 0;
-  private parameters: AppParameters;
-  private cma: CMAClient;
-  private entryId: string;
-  private setReferencesCount: (count: number) => void;
-  private setClonesCount: (count: number) => void;
-  private setUpdatesCount: (count: number) => void;
 
   constructor(
-    cma: CMAClient,
-    parameters: AppParameters,
-    entryId: string,
-    setReferencesCount: (count: number) => void,
-    setClonesCount: (count: number) => void,
-    setUpdatesCount: (count: number) => void
-  ) {
-    this.cma = cma;
-    this.parameters = parameters;
-    this.entryId = entryId;
-    this.setReferencesCount = setReferencesCount;
-    this.setClonesCount = setClonesCount;
-    this.setUpdatesCount = setUpdatesCount;
-  }
+    private cma: CMAClient,
+    private parameters: AppParameters,
+    private entryId: string,
+    private setReferencesCount: (_count: number) => void,
+    private setClonesCount: (_count: number) => void,
+    private setUpdatesCount: (_count: number) => void
+  ) {}
 
   async cloneEntry(): Promise<EntryProps> {
     if (Object.keys(this.references).length === 0) {

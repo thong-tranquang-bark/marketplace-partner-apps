@@ -14,6 +14,7 @@ tags
 .cursorindexingignore
 .specstory
 .cursor
+.history
 
 # Coverage directories and files
 coverage/
