@@ -1,45 +1,46 @@
-import { Checkbox, Text, Box, Flex, IconButton, Tooltip } from '@contentful/f36-components';
-import { AssetIcon, ChevronRightIcon, ChevronDownIcon } from '@contentful/f36-icons';
-import { TreeNode } from './ReferencesTree.types';
+import { Text, Box, Flex, IconButton, Tooltip } from '@contentful/f36-components';
+import { ChevronRightIcon, ChevronDownIcon } from '@contentful/f36-icons';
+import { TreeNode } from '../ReferencesTree.types';
 import {
   treeNodeStyles,
   treeNodeWrapper,
   treeNodeSpacer,
-  treeNodeIconButton,
-  treeNodeInnerFlex,
-  treeNodeIcon,
-  treeNodeText,
-} from './ReferencesTree.styles';
+  treeNodeIconButton
+} from '../ReferencesTree.styles';
+import { NodeItem } from '../node-item/NodeItem';
 
-interface TreeNodeComponentProps {
+interface TreeComponentProps {
   node: TreeNode;
   selectedIds: Set<string>;
   expandedIds: Set<string>;
   onToggle: (_path: string, _entryId: string) => void;
   onToggleExpand: (_entryId: string) => void;
+  rootNodeId: string;
   level?: number;
   isLast?: boolean;
   path?: string;
   disabledPaths: Set<string>;
 }
 
-export function TreeNodeComponent({
+export function TreeComponent({
   node,
   selectedIds,
   expandedIds,
   onToggle,
   onToggleExpand,
+  rootNodeId,
   level = 0,
   isLast = false,
   path = '',
   disabledPaths,
-}: TreeNodeComponentProps) {
+}: TreeComponentProps) {
   // Use path-based key to uniquely identify this node instance
   const nodePath = path ? `${path}:${node.entryId}` : node.entryId;
   const isSelected = selectedIds.has(nodePath);
   const hasChildren = node.children.length > 0;
   const isExpanded = expandedIds.has(node.entryId);
   const isDisabled = disabledPaths.has(nodePath) || !!node.isMorePlaceholder;
+  const isRoot = node.entryId === rootNodeId;
 
   // Special rendering for "+more" placeholder
   if (node.isMorePlaceholder) {
@@ -61,7 +62,7 @@ export function TreeNodeComponent({
 
   return (
     <Flex alignItems="flex-start" gap="spacing2Xs">
-      {hasChildren ? (
+      {hasChildren && !isRoot && (
         <IconButton
           variant="transparent"
           size="small"
@@ -71,39 +72,27 @@ export function TreeNodeComponent({
           className={treeNodeIconButton}
           style={{ marginTop: '5px' }}
         />
-      ) : (
+      )}
+      {!hasChildren && !isRoot && (
         <Box className={treeNodeSpacer} />
       )}
       <Box className={`${treeNodeStyles} ${treeNodeWrapper} ${isLast ? 'is-last-child' : ''}`}>
-        <Box className="tree-node-item">
-          <Checkbox
-            className="tree-node-item-checkbox"
-            isChecked={isSelected}
-            isDisabled={isDisabled}
-            onChange={() => onToggle(nodePath, node.entryId)}
-            id={`checkbox-${nodePath}`}
-          >
-            <Flex alignItems="center" gap="spacing2Xs" className={treeNodeInnerFlex}>
-              {node.isAsset && (
-                <AssetIcon variant="muted" size="small" className={treeNodeIcon} />
-              )}
-              <Text fontWeight="fontWeightDemiBold" className={treeNodeText}>
-                {node.displayName}
-              </Text>
-              {node.internalName && (
-                <Text fontWeight="fontWeightNormal" fontColor="gray600" className={treeNodeText}>
-                  ({node.internalName})
-                </Text>
-              )}
-            </Flex>
-          </Checkbox>
+        <Box className={`tree-node-item ${isDisabled || isRoot ? 'disabled' : ''} ${isExpanded ? 'expanded' : ''}`}>
+          <NodeItem
+            node={node}
+            isSelected={isSelected}
+            isDisabled={isDisabled || isRoot}
+            onToggle={onToggle}
+            nodePath={nodePath}
+          />
         </Box>
         {hasChildren && isExpanded && (
           <Box className="tree-node-children">
             {node.children.map((child, index) => (
-              <TreeNodeComponent
+              <TreeComponent
                 key={`${nodePath}:${child.entryId}`}
                 node={child}
+                rootNodeId={rootNodeId}
                 selectedIds={selectedIds}
                 expandedIds={expandedIds}
                 onToggle={onToggle}

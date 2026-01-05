@@ -51,10 +51,10 @@ function Sidebar() {
         tree: Record<string, any>,
         entryId: string,
         listBlockContentIds: string[] = [] // Example: ['alternateBackground']
-    ): Promise<{ selectedIds: string[]; unselectedIds: string[] } | null> => {
+    ): Promise<string[] | null> => {
         try {
             const dialogResult = await sdk.dialogs.openCurrentApp({
-                title: 'Deep Clone Selection',
+                title: 'Deep Clone Selection (Select entries to clone)',
                 position: 'center',
                 shouldCloseOnOverlayClick: true,
                 shouldCloseOnEscapePress: true,
@@ -70,12 +70,8 @@ function Sidebar() {
             if (!dialogResult || dialogResult === null) {
                 return null;
             }
-
-            // Process dialog result
-            const selectedIds = dialogResult as string[];
-            const keysTree = Object.keys(tree);
-            const unselectedIds = keysTree.filter((id) => !selectedIds.includes(id));
-            return { selectedIds, unselectedIds };
+            
+            return dialogResult as string[];
         } catch (_error) {
             sdk.notifier.error('Failed to open dialog');
             return null;
@@ -89,11 +85,13 @@ function Sidebar() {
         await sdk.entry.save();
         const cloner = new EntryCloner(sdk.cma, parameters, sdk.ids.entry, setReferencesCount, setClonesCount, setUpdatesCount);
         const tree = await cloner.getReferencesTree();
-        const dialogResult = await openReferencesDialog(tree, sdk.ids.entry);
-        if (!dialogResult) {
+        const selectedComponentIds = await openReferencesDialog(tree, sdk.ids.entry, parameters.referenceOnlyComponents.map((component) => component.id));
+        if (!selectedComponentIds || selectedComponentIds.length === 0) {
             resetState();
             return;
         }
+        
+        cloner.shouldCloneComponents = selectedComponentIds;
         setIsConfirming(false);
         setIsCloning(true);
 

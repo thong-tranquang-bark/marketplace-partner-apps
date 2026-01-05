@@ -6,8 +6,9 @@ import {
   collectAllNodeIds,
   collectDisabledPaths,
 } from './ReferencesTree.utils';
-import { TreeNodeComponent } from './TreeNodeComponent';
-import { treeContainerStyles, treeTitleText, treeLoadingContainer } from './ReferencesTree.styles';
+import { TreeComponent } from './tree/TreeComponent';
+import { treeContainerStyles, treeLoadingContainer } from './ReferencesTree.styles';
+import { MAX_NODES_TO_EXPAND } from './constant';
 
 export type { TreeNode, ReferencesTreeProps } from './ReferencesTree.types';
 
@@ -17,7 +18,7 @@ export function ReferencesTree({
   onSelectedIdsChange,
   listBlockContentIds = [],
 }: ReferencesTreeProps) {
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set([parentEntryId]));
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [isLoadingNodes, setIsLoadingNodes] = useState<boolean>(false);
 
@@ -33,16 +34,16 @@ export function ReferencesTree({
 
   // Initialize expandedIds with all node IDs so all nodes are expanded by default
   useEffect(() => {
-    if (tree) {
-      setIsLoadingNodes(true);
-      // Use setTimeout to allow UI to update and show spinner
-      setTimeout(() => {
-        const allNodeIds = collectAllNodeIds(tree);
-        setExpandedIds(allNodeIds);
-        setIsLoadingNodes(false);
-      }, 0);
-    }
-  }, [tree]);
+    if (!tree) return;
+
+    setIsLoadingNodes(true);
+    // Use setTimeout to allow UI to update and show spinner
+    setTimeout(() => {
+      const allNodeIds = Object.keys(referencesTree).length > MAX_NODES_TO_EXPAND ? new Set<string>([parentEntryId]) : collectAllNodeIds(tree);
+      setExpandedIds(allNodeIds);
+      setIsLoadingNodes(false);
+    }, 0);
+  }, [tree, referencesTree, parentEntryId]);
 
   // Filter out disabled nodes from selection on mount and when disabledPaths changes
   useEffect(() => {
@@ -135,20 +136,20 @@ export function ReferencesTree({
   }
 
   return (
-    <Stack spacing="spacingM" flexDirection="column" className="f36-content-width--default">
-      <Text className={treeTitleText} fontWeight="fontWeightDemiBold" style={{ marginTop: '20px' }}>Select entries to clone:</Text>
+    <Stack spacing="spacingM" flexDirection="column" className="f36-content-width--default" style={{ marginTop: '20px', width: '100%' }}>
       <Box className={treeContainerStyles}>
         {isLoadingNodes ? (
           <Box className={treeLoadingContainer}>
             <Spinner size="large" />
           </Box>
         ) : (
-          <TreeNodeComponent
+          <TreeComponent
             node={tree}
             selectedIds={selectedIds}
             expandedIds={expandedIds}
             onToggle={handleToggle}
             onToggleExpand={handleToggleExpand}
+            rootNodeId={parentEntryId}
             disabledPaths={disabledPaths}
           />
         )}

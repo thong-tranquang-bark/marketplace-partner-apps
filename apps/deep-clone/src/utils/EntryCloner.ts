@@ -11,6 +11,15 @@ class EntryCloner {
   private contentTypes: { [id: string]: ContentTypeProps } = {};
   private updates: number = 0;
 
+  private _shouldCloneComponents: string[] = [];
+  set shouldCloneComponents(components: string[]) {
+    this._shouldCloneComponents = components;
+  }
+
+  get shouldCloneComponents(): string[] {
+    return this._shouldCloneComponents;
+  }
+
   constructor(
     private cma: CMAClient,
     private parameters: AppParameters,
@@ -21,9 +30,6 @@ class EntryCloner {
   ) {}
 
   async cloneEntry(): Promise<EntryProps> {
-    if (Object.keys(this.references).length === 0) {
-      await this.findReferences(this.entryId);
-    }
     await this.createClones();
     await this.updateReferenceTree();
     return this.clones[this.entryId] as EntryProps;
@@ -68,19 +74,25 @@ class EntryCloner {
   }
 
   private async createClones(): Promise<void> {
-    const clonePromises = Object.entries(this.references).map(async ([entryId, entry]) => {
-      try {
-        const entryFields = await this.getFieldsForClone(entry);
-        const createProps: CreateEntryProps = {
-          fields: entryFields,
-          ...(entry.metadata ? { metadata: entry.metadata } : {}),
-        };
-        const clone = await this.cma.entry.create({ contentTypeId: entry.sys.contentType.sys.id }, createProps);
-        this.clones[entryId] = clone;
-        this.setClonesCount(Object.keys(this.clones).length);
-      } catch (error) {
-        console.warn('Error creating clone', error);
-      }
+    Object.entries(this.references).filter(([entryId, _]) => !this.shouldCloneComponents.includes(entryId))
+      .forEach(([entryId, entry]) => {
+        this.clones[entryId] = entry;
+      });
+
+    const cloneComponents = Object.entries(this.references).filter(([entryId, _]) => entryId === this.entryId || this.shouldCloneComponents.includes(entryId));
+    const clonePromises = cloneComponents.map(async ([entryId, entry]) => {
+        try {
+          const entryFields = await this.getFieldsForClone(entry);
+          const createProps: CreateEntryProps = {
+            fields: entryFields,
+            ...(entry.metadata ? { metadata: entry.metadata } : {}),
+          };
+          const clone = await this.cma.entry.create({ contentTypeId: entry.sys.contentType.sys.id }, createProps);
+          this.clones[entryId] = clone;
+          this.setClonesCount(Object.keys(this.clones).length);
+        } catch (error) {
+          console.warn('Error creating clone', error);
+        }
     });
 
     await Promise.all(clonePromises);

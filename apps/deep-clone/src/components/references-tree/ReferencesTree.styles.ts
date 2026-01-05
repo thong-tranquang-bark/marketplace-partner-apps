@@ -3,23 +3,18 @@ import { css } from '@emotion/css';
 export const treeContainerStyles = css`
   height: auto;
   overflow-y: auto;
-  width: 1000px;
+  width: 100%;
   box-sizing: border-box;
-
-  /* Responsive: use full width on smaller screens */
-  @media (max-width: 1200px) {
-    width: 1000px;
-  }
-  @media (max-width: 1000px) {
-    width: 800px;
-  }
+  padding: 0 1.5rem;
 `;
 
 export const treeNodeStyles = css`
   position: relative;
-  margin-bottom: 8px;
   width: 100%;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 
   .tree-node-item {
     border: 1px solid #e0e0e0;
@@ -33,10 +28,37 @@ export const treeNodeStyles = css`
     box-sizing: border-box;
     overflow: hidden;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+
+      &:hover {
+        border-color: #e0e0e0;
+        background-color: #ffffff;
+        cursor: not-allowed;
+      }
+
+      .tree-node-item-checkbox {
+        label {
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    &.expanded {
+      .tree-node-item-children-count {
+        visibility: visible !important;
+      }
+    }
 
     &:hover {
       border-color: #b0b0b0;
       background-color: #f9f9f9;
+      cursor: pointer;
     }
 
     .tree-node-item-checkbox {
@@ -46,6 +68,20 @@ export const treeNodeStyles = css`
       flex: 1 1 auto;
       margin-top: 5px;
       margin-bottom: 5px;
+
+      &:hover {
+        .tree-node-item-children-count {
+          visibility: visible;
+        }
+      }
+
+      .tree-node-item-children-count {
+        visibility: hidden;
+      }
+
+      label {
+        cursor: pointer;
+      }
 
       > * {
         width: 100%;
@@ -58,9 +94,10 @@ export const treeNodeStyles = css`
 
   .tree-node-children {
     position: relative;
-    margin-top: 8px;
-    width: calc(100% - 24px);
-    max-width: calc(100% - 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
     box-sizing: border-box;
   }
 
@@ -109,7 +146,7 @@ export const treeNodeWrapper = css`
 `;
 
 export const treeNodeSpacer = css`
-  width: 30px;
+  width: 32px;
   flex-shrink: 0;
 `;
 
