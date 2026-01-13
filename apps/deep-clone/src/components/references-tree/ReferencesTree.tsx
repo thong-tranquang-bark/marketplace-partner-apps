@@ -154,10 +154,6 @@ export function ReferencesTree({
           />
         )}
       </Box>
-
-      <Text fontSize="fontSizeL">
-        <strong>{selectedIds.size}</strong> of <strong>{Object.keys(referencesTree).length}</strong> selected entries will be created.
-      </Text>
     </Stack>
   );
 }

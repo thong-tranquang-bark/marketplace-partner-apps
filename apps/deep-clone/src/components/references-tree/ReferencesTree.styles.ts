@@ -1,6 +1,7 @@
 import { css } from '@emotion/css';
 
 export const treeContainerStyles = css`
+  max-height: 80vh;
   height: auto;
   overflow-y: auto;
   width: 100%;
@@ -186,6 +187,16 @@ export const treeLoadingContainer = css`
 
 export const containerButtons = css`
   float: right;
-  margin: 0 16px 16px 0;
+  margin: 0 24px 10px 0;
   display: inline-block;
+  position: absolute;
+  right: 0;
+`;
+
+export const containerButtonsDialog = css`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin: 30px 16px 0px 0px;
 `;

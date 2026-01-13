@@ -59,6 +59,7 @@ function Sidebar() {
                 shouldCloseOnOverlayClick: true,
                 shouldCloseOnEscapePress: true,
                 width: 1200,
+                minHeight: '70vh',
                 parameters: {
                     referencesTree: JSON.parse(JSON.stringify(tree)) as any,
                     parentEntryId: entryId,

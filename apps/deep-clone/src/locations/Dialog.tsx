@@ -5,7 +5,7 @@ import { EntryProps } from 'contentful-management';
 import { ReferencesTree } from '../components/references-tree/ReferencesTree';
 import { Stack, Button, Text } from '@contentful/f36-components';
 import { useAutoResizer } from '@contentful/react-apps-toolkit';
-import { containerButtons } from '../components/references-tree/ReferencesTree.styles';
+import { containerButtons, containerButtonsDialog } from '../components/references-tree/ReferencesTree.styles';
 
 function Dialog() {
     const sdk = useSDK<DialogAppSDK>();
@@ -51,9 +51,12 @@ function Dialog() {
                 listBlockContentIds={listBlockContentIds}
             />
 
-            <div style={{ width: '100%' }}>
+            <div className={containerButtonsDialog}>
+                <Text fontSize="fontSizeL" style={{ textAlign: 'center', flex: 1 }}>
+                    <strong>{selectedIds.size}</strong> of <strong>{Object.keys(referencesTree).length}</strong> selected entries will be created.
+                </Text>
                 <div className={containerButtons}>
-                    <Button onClick={handleClose} variant="secondary" style={{ marginRight: '16px' }}>
+                    <Button onClick={handleClose} variant="secondary" style={{ marginRight: '8px' }}>
                         Close
                     </Button>
                     <Button onClick={handleClone} variant="primary">
