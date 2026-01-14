@@ -136,8 +136,8 @@ export function ReferencesTree({
   }
 
   return (
-    <Stack spacing="spacingM" flexDirection="column" className="f36-content-width--default" style={{ marginTop: '20px', width: '100%' }}>
-      <Box className={treeContainerStyles}>
+    <Stack spacing="spacingM" flexDirection="column" style={{ marginTop: '20px', width: '100%' }}>
+      <Box className={`${treeContainerStyles}`}>
         {isLoadingNodes ? (
           <Box className={treeLoadingContainer}>
             <Spinner size="large" />
