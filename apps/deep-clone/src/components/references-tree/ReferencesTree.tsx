@@ -136,8 +136,8 @@ export function ReferencesTree({
   }
 
   return (
-    <Stack spacing="spacingM" flexDirection="column" className="f36-content-width--default" style={{ marginTop: '20px', width: '100%' }}>
-      <Box className={treeContainerStyles}>
+    <Stack spacing="spacingM" flexDirection="column" style={{ marginTop: '20px', width: '100%' }}>
+      <Box className={`${treeContainerStyles}`}>
         {isLoadingNodes ? (
           <Box className={treeLoadingContainer}>
             <Spinner size="large" />
@@ -154,10 +154,6 @@ export function ReferencesTree({
           />
         )}
       </Box>
-
-      <Text fontSize="fontSizeL">
-        <strong>{selectedIds.size}</strong> of <strong>{Object.keys(referencesTree).length}</strong> selected entries will be created.
-      </Text>
     </Stack>
   );
 }
