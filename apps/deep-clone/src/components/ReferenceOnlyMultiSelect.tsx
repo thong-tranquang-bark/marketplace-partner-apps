@@ -5,21 +5,22 @@ import { ContentTypeProps } from 'contentful-management';
 import { CMAClient, ConfigAppSDK } from '@contentful/app-sdk';
 import { ContentType } from '../types';
 
-interface ContentTypeMultiSelectProps {
+interface ReferenceOnlyMultiSelectProps {
   selectedContentTypes: ContentType[];
   setSelectedContentTypes: (_contentTypes: ContentType[]) => void;
   sdk: ConfigAppSDK;
   cma: CMAClient;
 }
 
-const ContentTypeMultiSelect: React.FC<ContentTypeMultiSelectProps> = ({ selectedContentTypes, setSelectedContentTypes, sdk, cma }) => {
+const ReferenceOnlyMultiSelect: React.FC<ReferenceOnlyMultiSelectProps> = ({ selectedContentTypes, setSelectedContentTypes, sdk, cma }) => {
   const [availableContentTypes, setAvailableContentTypes] = useState<ContentType[]>([]);
+  const [filteredItems, setFilteredItems] = React.useState<ContentType[]>([]);
+
   const getPlaceholderText = (): string => {
     if (selectedContentTypes.length === 0) return 'Select one or more';
     if (selectedContentTypes.length === 1) return selectedContentTypes[0]?.name || '';
     return `${selectedContentTypes[0]?.name || ''} and ${selectedContentTypes.length - 1} more`;
   };
-  const [filteredItems, setFilteredItems] = React.useState<ContentType[]>([]);
 
   const handleSearchValueChange = (event: { target: { value: any } }) => {
     const value = event.target.value;
@@ -29,9 +30,6 @@ const ContentTypeMultiSelect: React.FC<ContentTypeMultiSelectProps> = ({ selecte
 
   useEffect(() => {
     (async () => {
-      const currentState = await sdk.app.getCurrentState();
-      const currentContentTypesIds = Object.keys(currentState?.EditorInterface || {});
-
       const fetchAllContentTypes = async (): Promise<ContentTypeProps[]> => {
         let allContentTypes: ContentTypeProps[] = [];
         let skip = 0;
@@ -56,7 +54,7 @@ const ContentTypeMultiSelect: React.FC<ContentTypeMultiSelectProps> = ({ selecte
         return allContentTypes;
       };
 
-      const allContentTypes = await fetchAllContentTypes();
+      const allContentTypes = await fetchAllContentTypes();      
 
       const newAvailableContentTypes = allContentTypes
         .map((ct) => ({
@@ -67,14 +65,8 @@ const ContentTypeMultiSelect: React.FC<ContentTypeMultiSelectProps> = ({ selecte
 
       setAvailableContentTypes(newAvailableContentTypes);
       setFilteredItems(newAvailableContentTypes);
-
-      // If we have current content types, set them as selected
-      if (currentContentTypesIds.length > 0) {
-        const currentContentTypes = allContentTypes.filter((ct) => currentContentTypesIds.includes(ct.sys.id)).map((ct) => ({ id: ct.sys.id, name: ct.name }));
-        setSelectedContentTypes(currentContentTypes);
-      }
     })();
-  }, [cma.contentType, sdk.app, sdk.ids.environment, sdk.ids.space, setSelectedContentTypes]);
+  }, [cma, sdk]);
 
   return (
     <>
@@ -84,12 +76,13 @@ const ContentTypeMultiSelect: React.FC<ContentTypeMultiSelectProps> = ({ selecte
             searchPlaceholder: 'Search content types',
             onSearchValueChange: handleSearchValueChange,
           }}
+          testId={'reference-only-components'}
           placeholder={getPlaceholderText()}>
           {filteredItems.map((item) => (
             <Multiselect.Option
-              key={item.id}
+              key={`reference-only-components-${item.id}`}
               value={item.id}
-              itemId={item.id}
+              itemId={`reference-only-components-${item.id}`}
               isChecked={selectedContentTypes.some((ct) => ct.id === item.id)}
               onSelectItem={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const checked = e.target.checked;
@@ -123,4 +116,4 @@ const ContentTypeMultiSelect: React.FC<ContentTypeMultiSelectProps> = ({ selecte
   );
 };
 
-export default ContentTypeMultiSelect;
+export default ReferenceOnlyMultiSelect;
